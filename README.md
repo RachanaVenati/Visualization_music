@@ -2,8 +2,8 @@
 
 # Problem statement
 Visualization of relation between music parameters like tempo, and energy to the socioeconomic condition of the country.
-
 Geoheat map to show country contribution.
+
 -------------------------------------------------------------------------------------------------------------------------------------
 
 # Data Set
