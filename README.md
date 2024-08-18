@@ -24,3 +24,6 @@ https://observablehq.com/@mbostock/electric-usage-2019
 # Geo map d3
 
 https://www.d3indepth.com/geographic/
+
+# COMMENTS
+1.please replace actual .csv in data folder https://www.kaggle.com/datasets/brunoalarcon123/top-200-spotify-songs-dataset unable to upload to git since it is of 157 mb.
