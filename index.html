@@ -1,9 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Project</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSIC PARAMETERS AND SOCIO ECONOMIC CONDITIONS</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Your content -->
+    <header>
+        <h1>MUSIC AND SOCIOECONOMIC CONDITIONS</h1>
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111624.png" alt="Spotify Logo" id="spotify-logo">
+    </header>
+
+    <div class="content">
+        <section class="section" id="music-parameters">
+            <div class="section-header">
+                <h2>PARAMETERS OVER YEARS</h2>
+                <div class="dropdowns">
+                    <div class="dropdown-box">
+                        <label for="year-select">Year:</label>
+                        <select id="year-select">
+                            <option value="all">All</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-box">
+                        <label for="parameter-select">Music Parameter:</label>
+                        <select id="parameter-select">
+                            <option value="danceability">Danceability</option>
+                            <option value="energy">Energy</option>
+                            <option value="loudness">Loudness</option>
+                            <option value="valence">Valence</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="calendar-heatmap">
+                <!-- Calendar Heatmap will be rendered here -->
+            </div>
+        </section>
+
+        <section class="section" id="country-contribution">
+            <div class="section-header">
+                <h2>Contribution of countries</h2>
+                <div class="dropdowns">
+                    <div class="dropdown-box">
+                        <label for="from-date">From:</label>
+                        <input type="text" id="from-date" class="datepicker" placeholder="Select Date">
+                    </div>
+                    <div class="dropdown-box">
+                        <label for="to-date">To:</label>
+                        <input type="text" id="to-date" class="datepicker" placeholder="Select Date">
+                    </div>
+                </div>
+            </div>
+            <div id="geo-heatmap">
+                <!-- Geo Heatmap will be rendered here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <script src="js/calendarHeatmap.js"></script>
+    <script src="js/geoHeatmap.js"></script>
 </body>
 </html>
