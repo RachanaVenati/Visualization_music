@@ -82,15 +82,15 @@ header h1 {
 
 /* Visualization Containers */
 #calendar-heatmap {
-    height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    background-color: #f4f4f4;
-    margin-top: 20px;
+    background-color: #ffffff;
+    max-width: 100%;  /* Ensure the heatmap does not exceed the width of its container */
+    max-height: 400px;  /* Set a maximum height for the heatmap container */
+    overflow: auto;  /* Make the heatmap scrollable if it overflows */
+    padding: 10px;  /* Optional: Add some padding inside the container */
+    border: 1px solid #ccc;  /* Optional: Add a border for better visual separation */
+    box-sizing: border-box;  /* Ensure padding and border are included in the element's width and height */
 }
+
 
 #geo-heatmap {
     height: 500px;
