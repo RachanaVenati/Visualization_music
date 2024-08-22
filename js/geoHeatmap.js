@@ -4,18 +4,24 @@ Promise.all([
     d3.dsv(";", "data/Spotify_Dataset_V3.csv") 
 ]).then(([geoData, spotifyData]) => {
 
+    const countryNameMapping = {
+        "United States": "USA",
+        "United Kingdom": "England",
+        // Add other mappings as necessary
+    };
+
     // Prepare the data: Aggregate by Nationality, summing Points (Total)
     const countryData = d3.rollup(
         spotifyData,
         v => d3.sum(v, d => +d['Points (Total)']), // Summing 'Points (Total)' for each nationality
-        d => d['Nationality'] // Assuming 'Nationality' contains country codes or names
+        d => countryNameMapping[d.Nationality] || d.Nationality// Assuming 'Nationality' contains country codes or names
     );
 
     // Set up the SVG dimensions
     const width = 960;
     const height = 600;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-
+    
     const svg = d3.select("#geo-heatmap")
         .append("svg")
         .attr("width", width)
@@ -29,8 +35,8 @@ Promise.all([
     const path = d3.geoPath().projection(projection);
 
     // Set up a color scale
-    const colorScale = d3.scaleDiverging(d3.interpolateRdYlBu)
-    .domain([0, d3.max([...countryData.values()]) * 0.5, d3.max([...countryData.values()])]);
+    const colorScale = d3.scaleSequential(d3.interpolateGreens)
+    .domain([0, d3.max([...countryData.values()])]);
 
 
 
