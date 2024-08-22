@@ -7,7 +7,7 @@ Promise.all([
     const countryNameMapping = {
         "United States": "USA",
         "United Kingdom": "England",
-        // Add other mappings as necessary
+        
     };
 
     // Prepare the data: Aggregate by Nationality, summing Points (Total)
