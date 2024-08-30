@@ -4,38 +4,92 @@ body {
     margin: 0;
     padding: 0;
     background-color: #e5e2e2;
-    color: #333;
+    color: #333333;
 }
 
 /* Header Styling */
 header {
-    background-color: #58bc7b;  /* Spotify green */
-    color: rgba(89, 91, 87, 0.988);
+    background-color: #c4da9c;  /* Spotify green */
+    color: rgba(52, 54, 52, 0.988);
     padding: 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
     margin: 0;
+    margin-left: 100px;
     font-size: 1.8rem;
 }
 
 #spotify-logo {
     width: 40px;
     height: 40px;
+    position: absolute;
+    top: 3.1%;
+    right: 95%;
 }
-
+/* Content Area Styling */
 /* Content Area Styling */
 .content {
     padding: 40px 20px;
+    position: relative;
 }
 
-.section {
-    background-color: rgb(235, 247, 212);
+/* Parent Section Styling */
+#analysis-section {
+    background-color: #f9fafb;
     padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Section Header Styling */
+#analysis-section .section-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Dropdowns Wrapper */
+.dropdowns {
+    display: flex;  /* Make dropdowns display side by side */
+    gap: 20px;  /* Adjusts space between the dropdowns */
+}
+
+/* Dropdown Box Styling */
+.dropdown-box {
+    background-color: #ebf7d4;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 160px; /* Ensure both dropdowns have the same width */
+}
+
+.dropdown-box label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.dropdown-box select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%; /* Ensure the select box fits the parent width */
+}
+
+/* Section Styling */
+.section {
+    background-color: #ebf7d4;
+    padding: 10px;
     margin-bottom: 30px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -46,51 +100,17 @@ header h1 {
     margin-bottom: 20px;
     color: #8e9791;
 }
-/* Section Header Styling with Dropdowns */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.dropdowns {
-    display: flex;
-    gap: 20px;  /* Space between the two dropdown boxes */
-}
-
-.dropdown-box {
-    background-color: #d3f0bf;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.dropdown-box label {
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.dropdown-box select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 160px;
-}
 
 /* Visualization Containers */
 #calendar-heatmap {
     background-color: #ffffff;
-    max-width: 100%;  /* Ensure the heatmap does not exceed the width of its container */
-    max-height: 400px;  /* Set a maximum height for the heatmap container */
-    overflow: auto;  /* Make the heatmap scrollable if it overflows */
-    padding: 10px;  /* Optional: Add some padding inside the container */
-    border: 1px solid #ccc;  /* Optional: Add a border for better visual separation */
-    box-sizing: border-box;  /* Ensure padding and border are included in the element's width and height */
+    max-width: 100%;
+    max-height: 400px;
+    overflow: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
-
 
 #geo-heatmap {
     height: 500px;
@@ -115,5 +135,9 @@ header h1 {
 
     .section h2 {
         font-size: 2rem;
+    }
+
+    #analysis-section {
+        padding: 40px;
     }
 }

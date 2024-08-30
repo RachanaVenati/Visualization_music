@@ -1,41 +1,52 @@
-// calendar-heatmap.js
+// Function to initialize and update the calendar heatmap
+function updateHeatmap() {
+  // Get the selected parameter from the dropdown
+  const selectedParameter = document.getElementById("parameter-select").value;
 
-// Parse the CSV data
-d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
+  // Parse the CSV data and create the heatmap
+  d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
     const container = document.getElementById("calendar-heatmap");
     const containerWidth = container.clientWidth;
+
+    // Parse and group the data by date
     const parsedData = d3.group(data.map(d => ({
         date: d3.timeParse("%d/%m/%Y")(d.Date),
-        energy: +d.Energy
+        value: +d[selectedParameter]
     })), d => d.date);
+
+    // Calculate the average of the first 20 values for each date
     const averageData = Array.from(parsedData, ([date, values]) => {
-        // Take the first 20 energy values for the day
-        const first20Values = values.slice(0, 20);
-        
-        // Calculate the average of these 20 energy values
-        const averageFirst20Energy = d3.mean(first20Values, v => v.energy);
-        return {
-            date: date,
-            energy: averageFirst20Energy
-        };
-    });    
-    
+      const first20Values = values.slice(0, 20);
+      const averageFirst20 = d3.mean(first20Values, v => v.value);
+      return {
+        date: date,
+        value: averageFirst20
+      };
+    });
+
+    // Create the calendar heatmap with the updated data
     const calendarHeatmap = Calendar(averageData, {
-        x: d => d.date,
-        y: d => d.energy,
-        width: containerWidth,  // Set width dynamically based on container size
-        cellSize: 18.5,          
-        weekday: "monday",
-        colors: d3.interpolatePiYG
+      x: d => d.date,
+      y: d => d.value,
+      width: containerWidth,
+      cellSize: 18.5,
+      weekday: "monday",
+      colors: d3.interpolatePiYG
     });
 
     // Clear any existing content in the heatmap container
     container.innerHTML = '';
 
-    // Append the heatmap to the div
+    // Append the new heatmap to the container
     container.appendChild(calendarHeatmap);
-});
+  });
+}
 
+// Add event listener to the dropdown to update the heatmap on selection change
+document.getElementById("parameter-select").addEventListener("change", updateHeatmap);
+
+// Initial call to render the heatmap with default parameter
+updateHeatmap();
 
 // Calendar Heatmap function
 function Calendar(data, {
@@ -58,12 +69,12 @@ function Calendar(data, {
   const timeWeek = weekday === "sunday" ? d3.timeSunday : d3.timeMonday;
   const weekDays = weekday === "weekday" ? 5 : 7;
   const height = cellSize * (weekDays + 2);
- 
+
   const max = d3.quantile(Y, 1, Math.abs);
   const color = d3.scaleSequential([-max, +max], colors).unknown("none");
 
   formatMonth = d3.utcFormat(formatMonth);
- 
+
   if (title === undefined) {
     const formatDate = d3.timeFormat("%B %-d, %Y");
     const formatValue = color.tickFormat(5, yFormat);
@@ -73,7 +84,7 @@ function Calendar(data, {
     title = i => T[i];
   }
 
-  const years = d3.groups(I, i => X[i].getUTCFullYear()).reverse();
+  const years = d3.groups(I, i => X[i].getUTCFullYear());
 
   function pathMonth(t) {
     const d = Math.max(0, Math.min(weekDays, countDay(t.getUTCDay())));
@@ -84,12 +95,12 @@ function Calendar(data, {
   }
 
   const svg = d3.create("svg")
-      .attr("width", width)
-      .attr("height", height * years.length)
-      .attr("viewBox", [0, 0, width, height * years.length])
-      .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10);
+    .attr("width", width)
+    .attr("height", height * years.length)
+    .attr("viewBox", [0, 0, width, height * years.length])
+    .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 10);
 
   const year = svg.selectAll("g")
     .data(years)
@@ -97,14 +108,14 @@ function Calendar(data, {
       .attr("transform", (d, i) => `translate(40.5,${height * i + cellSize * 1.5})`);
 
   year.append("text")
-      .attr("x", -5)
-      .attr("y", -5)
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "end")
-      .text(([key]) => key);
+    .attr("x", -5)
+    .attr("y", -5)
+    .attr("font-weight", "bold")
+    .attr("text-anchor", "end")
+    .text(([key]) => key);
 
   year.append("g")
-      .attr("text-anchor", "end")
+    .attr("text-anchor", "end")
     .selectAll("text")
     .data(weekday === "weekday" ? d3.range(1, 6) : d3.range(7))
     .join("text")
@@ -126,7 +137,7 @@ function Calendar(data, {
       .attr("fill", i => color(Y[i]));
 
   if (title) cell.append("title")
-      .text(title);
+    .text(title);
 
   const month = year.append("g")
     .selectAll("g")
@@ -134,16 +145,15 @@ function Calendar(data, {
     .join("g");
 
   month.filter((d, i) => i).append("path")
-      .attr("fill", "none")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 3)
-      .attr("d", pathMonth);
+    .attr("fill", "none")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 2)
+    .attr("d", pathMonth);
 
   month.append("text")
-      .attr("x", d => timeWeek.count(d3.utcYear(d), timeWeek.ceil(d)) * cellSize + 2)
-      .attr("y", -5)
-      .text(formatMonth);
+    .attr("x", d => timeWeek.count(d3.utcYear(d), timeWeek.ceil(d)) * cellSize + 3)
+    .attr("y", -5)
+    .text(formatMonth);
 
   return Object.assign(svg.node(), {scales: {color}});
 }
-

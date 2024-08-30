@@ -8,17 +8,15 @@
 </head>
 <body>
     <header>
-        <h1>MUSIC AND SOCIOECONOMIC CONDITIONS</h1>
         <img src="https://cdn-icons-png.flaticon.com/512/2111/2111624.png" alt="Spotify Logo" id="spotify-logo">
+        <h1>MUSIC AND SOCIOECONOMIC CONDITIONS</h1>
     </header>
-
     <div class="content">
-        <section class="section" id="music-parameters">
+        <section id="analysis-section">
             <div class="section-header">
-                <h2>PARAMETERS OVER YEARS</h2>
                 <div class="dropdowns">
-                    <div class="dropdown-box">
-                        <label for="year-select">Year:</label>
+                    <div class="dropdown-box" id="year-dropdown">
+                        <label for="year-select">YEAR:</label>
                         <select id="year-select">
                             <option value="all">All</option>
                             <option value="2017">2017</option>
@@ -33,38 +31,36 @@
                     <div class="dropdown-box">
                         <label for="parameter-select">Music Parameter:</label>
                         <select id="parameter-select">
-                            <option value="danceability">Danceability</option>
-                            <option value="energy">Energy</option>
-                            <option value="loudness">Loudness</option>
-                            <option value="valence">Valence</option>
+                            <option value="Valence">Valence</option>
+                            <option value="Danceability">Danceability</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Loudness">Loudness</option>
+                            
                         </select>
                     </div>
                 </div>
             </div>
-            <div id="calendar-heatmap">
-                <!-- Calendar Heatmap will be rendered here -->
-            </div>
-        </section>
-
-        <section class="section" id="country-contribution">
-            <div class="section-header">
-                <h2>Contribution of countries</h2>
-                <div class="dropdowns">
-                    <div class="dropdown-box">
-                        <label for="from-date">From:</label>
-                        <input type="text" id="from-date" class="datepicker" placeholder="Select Date">
-                    </div>
-                    <div class="dropdown-box">
-                        <label for="to-date">To:</label>
-                        <input type="text" id="to-date" class="datepicker" placeholder="Select Date">
-                    </div>
+    
+            <section class="section" id="music-parameters">
+                <div class="section-header">
+                    <h2>PARAMETERS OVER YEARS</h2>
                 </div>
-            </div>
-            <div id="geo-heatmap">
-                <!-- Geo Heatmap will be rendered here -->
-            </div>
+                <div id="calendar-heatmap">
+                    <!-- Calendar Heatmap will be rendered here -->
+                </div>
+            </section>
+    
+            <section class="section" id="country-contribution">
+                <div class="section-header">
+                    <h2>CONTRIBUTION OF COUNTRIES</h2>
+                </div>
+                <div id="geo-heatmap">
+                    <!-- Geo Heatmap will be rendered here -->
+                </div>
+            </section>
         </section>
     </div>
+    
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="js/calendarHeatmap.js"></script>
