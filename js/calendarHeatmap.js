@@ -54,7 +54,7 @@ function Calendar(data, {
   y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
   title, // given d in data, returns the title text
   width = 960 - margin.left - margin.right, // width of the chart, in pixels
-  cellSize = 17, // width and height of an individual day, in pixels
+  cellSize = 10, // width and height of an individual day, in pixels
   margin = { top: 20, right: 30, bottom: 30, left: 30 },
   weekday = "monday", // either: weekday, sunday, or monday
   formatDay = i => "SMTWTFS"[i], // given a day number in [0, 6], the day-of-week label
@@ -86,15 +86,10 @@ function Calendar(data, {
     title = i => T[i];
   }
 
-  //const years = d3.groups(I, i => X[i].getUTCFullYear());
+
   const years = d3.groups(I, i => {
     const date = X[i];
     const year = date.getFullYear();
-    // Check if the date belongs to the first week of January but should be in the current year
-    // const week = timeWeek.count(d3.utcYear(date), date);
-    // if ((week === 52 || week===53)&& date.getUTCMonth() === 0 && date.getUTCDay()===1) {
-    //   return year + 1;
-    // }
     return year;
   });
 
@@ -102,10 +97,9 @@ function Calendar(data, {
   function pathMonth(t) {
     const d = Math.max(0, Math.min(weekDays, countDay(t.getDay())));
     const w = timeWeek.count(d3.timeYear(t), t);
-    const spacing = 3; // Add a small amount of space between months
-    return `${d === 0 ? `M${w * (cellSize + spacing)},0`
-        : d === weekDays ? `M${(w + 1) * (cellSize + spacing)},0`
-        : `M${(w + 1) * (cellSize + spacing)},0V${d * cellSize}H${w * (cellSize + spacing)}`}V${weekDays * cellSize}`;
+    return `${d === 0 ? `M${w * cellSize},0`
+        : d === weekDays ? `M${(w + 1) * cellSize},0`
+        : `M${(w + 1) * cellSize},0V${d * cellSize}H${w * cellSize}`}V${weekDays * cellSize}`;
   }
   
 
@@ -155,18 +149,14 @@ function Calendar(data, {
   if (title) cell.append("title")
     .text(title);
 
-  const month = year.append("g")
-    .selectAll("g")
-    .data(([, I]) => d3.timeMonths(d3.timeMonth(X[I[0]]), X[I[I.length - 1]]))
-    .join("g");
-
-  month.filter((d, i) => i).append("path")
-    .attr("fill", "none")
+ year.append("g")
+    .selectAll("path")
+    .data(([key, I]) =>{const monthDates=d3.timeMonths(d3.min(I,i=>X[i]),d3.max(I,i=>X[i]));return monthDates.map(date=>({date}));})
+    .join("path").attr("fill", "none")
     .attr("stroke", "#fff")
-    .attr("stroke-width", 4)
-    .attr("d", pathMonth);
-
-    month.append("text")
+    .attr("stroke-width",4)
+    .attr("d", d=>pathMonth(d.date))
+    .append("text")
   .attr("x", d => timeWeek.count(d3.timeYear(d), timeWeek.ceil(d)) * cellSize + (cellSize / 2))
   .attr("y", -5) // Adjust this value to position the labels correctly
   .attr("dy", "-0.5em") // Adjust for proper vertical spacing
