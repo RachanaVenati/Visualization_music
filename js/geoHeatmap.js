@@ -7,7 +7,7 @@ Promise.all([
     const countryNameMapping = {
         "United States": "USA",
         "United Kingdom": "England",
-        
+        // Add other mappings as necessary
     };
 
     // Prepare the data: Aggregate by Nationality, summing Points (Total)
@@ -30,7 +30,7 @@ Promise.all([
     // Set up the map projection and path generator
     const projection = d3.geoNaturalEarth1()
         .scale(160)
-        .translate([width / 2, height / 2]);
+        .translate([width / 2 -50 , height / 2]);
 
     const path = d3.geoPath().projection(projection);
 
@@ -80,42 +80,45 @@ Promise.all([
             d3.select(".tooltip").remove();
         });
 
-    // Optional: Add a legend or other UI elements here
-    // Create a legend for the color scale
-const legendWidth = 300;
-const legendHeight = 10;
+// Create a vertical legend for the color scale
+    const legendHeight = 300;
+    const legendWidth = 10;
 
-// Define the gradient for the legend
-const defs = svg.append("defs");
-const linearGradient = defs.append("linearGradient")
-    .attr("id", "linear-gradient");
+    // Define the gradient for the legend
+    const defs = svg.append("defs");
+    const linearGradient = defs.append("linearGradient")
+        .attr("id", "linear-gradient")
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "0%")
+        .attr("y2", "0%");
 
-// Define the gradient stops
-linearGradient.selectAll("stop")
-    .data(colorScale.range())
-    .join("stop")
-    .attr("offset", (d, i) => `${i * 100 / (colorScale.range().length - 1)}%`)
-    .attr("stop-color", d => d);
+    // Define the gradient stops
+    linearGradient.selectAll("stop")
+        .data(colorScale.range())
+        .join("stop")
+        .attr("offset", (d, i) => `${i * 100 / (colorScale.range().length - 1)}%`)
+        .attr("stop-color", d => d);
 
-// Draw the legend rectangle
-svg.append("rect")
-    .attr("x", width - legendWidth - 40)
-    .attr("y", height - 40)
-    .attr("width", legendWidth)
-    .attr("height", legendHeight)
-    .style("fill", "url(#linear-gradient)");
+    // Draw the legend rectangle
+    svg.append("rect")
+        .attr("x", width - legendWidth -70)
+        .attr("y", height / 2 - legendHeight / 2)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#linear-gradient)");
 
-// Add legend text
-const legendScale = d3.scaleLinear()
-    .domain(colorScale.domain())
-    .range([0, legendWidth]);
+    // Add legend text
+    const legendScale = d3.scaleLinear()
+        .domain(colorScale.domain())
+        .range([legendHeight, 0]);
 
-const legendAxis = d3.axisBottom(legendScale)
-    .ticks(5)
-    .tickFormat(d3.format(".0f"));
+    const legendAxis = d3.axisRight(legendScale)
+        .ticks(5)
+        .tickFormat(d3.format(".0f"));
 
-svg.append("g")
-    .attr("transform", `translate(${width - legendWidth - 40}, ${height - 30})`)
-    .call(legendAxis);
+    svg.append("g")
+        .attr("transform", `translate(${width - legendWidth - 60}, ${height / 2 - legendHeight / 2})`)
+        .call(legendAxis);
 
 });
