@@ -156,10 +156,13 @@ function Calendar(data, {
     .attr("stroke", "#fff")
     .attr("stroke-width",4)
     .attr("d", d=>pathMonth(d.date))
-    .append("text")
-  .attr("x", d => timeWeek.count(d3.timeYear(d), timeWeek.ceil(d)) * cellSize + (cellSize / 2))
-  .attr("y", -5) // Adjust this value to position the labels correctly
-  .attr("dy", "-0.5em") // Adjust for proper vertical spacing
+  year.append("g")
+  .selectAll("text")
+  .data(([key, I]) => d3.timeMonths(d3.min(I, i => X[i]), d3.max(I, i => X[i])))
+  .join("text")
+  .attr("x", d => timeWeek.count(d3.timeYear(d), d3.timeMonth(d)) * cellSize + (cellSize / 2)+25)
+  .attr("y", -1) 
+  .attr("dy", "-0.5em")
   .attr("text-anchor", "middle")
   .attr("font-weight", "bold")
   .text(formatMonth);
