@@ -45,15 +45,17 @@ https://gist.github.com/palewire/d2906de347a160f38bc0b7ca57721328
    1.First implement for all years by picking up nationality from the dataset and choosing the continent.
    
 05-AUG-2024
-1.Normalize the calendar color values 
+1.Normalize the calendar color values(done)
 
-2.Add scale to calendar heatmap
+2.Add scale to calendar heatmap(done)
 
-3.Bar chart instead of dropdowns
+3.Bar chart instead of dropdowns(Dyah)
 
-4.Show countries with zero points with a different color.
+4.Show countries with zero points with a different color.(Rachana)
 
-5.Implement to select country and show the respective details on the calendar heatmap.
+5. Implement to select country and show the respective details on the calendar heatmap (Rachana, Krishna).
+
+6.Change the country representation to percentages(Rachana)
 
    
 
