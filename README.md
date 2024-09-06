@@ -51,7 +51,7 @@ https://gist.github.com/palewire/d2906de347a160f38bc0b7ca57721328
 
 3.Bar chart instead of dropdowns(Dyah)
 
-4.Show countries with zero points with a different color.(Rachana)
+4.Show countries with zero points with a different color.(done)
 
 5. Implement to select country and show the respective details on the calendar heatmap (Rachana, Krishna).
 
