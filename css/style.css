@@ -117,10 +117,11 @@ header h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px dashed #ddd;
+    border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     margin-top: 20px;
+    box-sizing: border-box;
 }
 
 /* Media Queries */

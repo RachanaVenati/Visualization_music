@@ -21,7 +21,8 @@ Promise.all([
     const width = 960;
     const height = 600;
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-    
+    const zeroColor = "#f0f0f0";
+
     const svg = d3.select("#geo-heatmap")
         .append("svg")
         .attr("width", width)
@@ -36,7 +37,7 @@ Promise.all([
 
     // Set up a color scale
     const colorScale = d3.scaleSequential(d3.interpolateGreens)
-    .domain([0, d3.max([...countryData.values()])]);
+    .domain([1, d3.max([...countryData.values()])]);
 
 
 
@@ -48,7 +49,7 @@ Promise.all([
         .attr("fill", d => {
             const countryName = d.properties.name; // Country name from GeoJSON
             const contribution = countryData.get(countryName) || 0;
-            return colorScale(contribution);
+            return contribution> 0 ? colorScale(contribution):zeroColor;
         })
         .attr("stroke", "#333")
         .attr("stroke-width", 0.5)
@@ -83,7 +84,8 @@ Promise.all([
 // Create a vertical legend for the color scale
     const legendHeight = 300;
     const legendWidth = 10;
-
+    const legendOffsetX = 30;
+    
     // Define the gradient for the legend
     const defs = svg.append("defs");
     const linearGradient = defs.append("linearGradient")

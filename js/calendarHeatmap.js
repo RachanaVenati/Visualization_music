@@ -17,12 +17,17 @@ function updateHeatmap() {
     // Calculate the average of the first 20 values for each date
     const averageData = Array.from(parsedData, ([date, values]) => {
       const first20Values = values.slice(0, 20);
-      const averageFirst20 = d3.mean(first20Values, v => v.value);
+      let averageFirst20 = d3.mean(first20Values, v => v.value); // Use 'let' instead of 'const'
+    
+      // Check if the averageFirst20 is an integer, if not, format it to 2 decimal places
+      averageFirst20 = Number.isInteger(averageFirst20) ? averageFirst20 : parseFloat(averageFirst20.toFixed(2));
+    
       return {
         date: date,
         value: averageFirst20
       };
     });
+    
 
     // Create the calendar heatmap with the updated data
     const calendarHeatmap = Calendar(averageData, {
@@ -54,13 +59,13 @@ function Calendar(data, {
   y = ([, y]) => y, // given d in data, returns the (quantitative) y-value
   title, // given d in data, returns the title text
   width = 960 - margin.left - margin.right, // width of the chart, in pixels
-  cellSize = 10, // width and height of an individual day, in pixels
+  cellSize = 17, // width and height of an individual day, in pixels
   margin = { top: 20, right: 30, bottom: 30, left: 30 },
   weekday = "monday", // either: weekday, sunday, or monday
   formatDay = i => "SMTWTFS"[i], // given a day number in [0, 6], the day-of-week label
   formatMonth = "%b", // format specifier string for months (above the chart)
   yFormat, // format specifier string for values (in the title)
-  colors = d3.interpolatePiYG
+  color = d3.interpolatePiYG
 } = {}) {
   const X = d3.map(data, x);
   const Y = d3.map(data, y);
@@ -72,20 +77,23 @@ function Calendar(data, {
   const height = cellSize * (weekDays + 2) + margin.top + margin.bottom; // Adjusted height
 
 
-  const max = d3.quantile(Y, 1, Math.abs);
-  const color = d3.scaleSequential([-max, +max], colors).unknown("none");
-
+  const max = d3.max(Y); // Find the maximum value
+  const min = d3.min(Y);
+  color = d3.scaleSequential()
+  .domain([min, max]) // Set the domain from minimum to maximum
+  .interpolator(d3.interpolateGreens); 
   formatMonth = d3.timeFormat(formatMonth);
 
   if (title === undefined) {
     const formatDate = d3.timeFormat("%B %-d, %Y");
-    const formatValue = color.tickFormat(5, yFormat);
-    title = i => `${formatDate(X[i])}\n${formatValue(Y[i])}`;
+    const formatValue = v => Number.isInteger(v) ? v : parseFloat(v.toFixed(2)); // Format value
+    
+    title = i => `${formatDate(X[i])}\n${formatValue(Y[i])}`; // Use the formatted value
   } else if (title !== null) {
     const T = d3.map(data, title);
     title = i => T[i];
   }
-
+  
 
   const years = d3.groups(I, i => {
     const date = X[i];
@@ -166,7 +174,64 @@ function Calendar(data, {
   .attr("text-anchor", "middle")
   .attr("font-weight", "bold")
   .text(formatMonth);
+// Color scale for both heatmap and legend
 
-  
+color = d3.scaleSequential()
+  .domain([min, max])  // Same domain for both heatmap and legend
+  .interpolator(d3.interpolateGreens);
+
+// Create a group for the legend
+const legendHeight = 300;  // Height of the color scale
+const legendWidth = 20;    // Width of the color scale
+const legendMargin = { top: 20, right: 90 }; // Positioning of legend
+
+const legend = svg.append("g")
+  .attr("transform", `translate(${width - legendMargin.right}, ${legendMargin.top})`);
+
+// Create a linear gradient for the legend based on the heatmap color scale
+const defs = svg.append("defs");
+const linearGradient = defs.append("linearGradient")
+  .attr("id", "linear-gradient")
+  .attr("x1", "0%")
+  .attr("y1", "100%") // Start at the bottom
+  .attr("x2", "0%")
+  .attr("y2", "0%");  // End at the top
+
+// Use the color scale to set the gradient stops
+linearGradient.append("stop")
+  .attr("offset", "0%")
+  .attr("stop-color", color(min));  // Color for the minimum value
+
+linearGradient.append("stop")
+  .attr("offset", "100%")
+  .attr("stop-color", color(max));  // Color for the maximum value
+
+// Draw the color scale bar
+legend.append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("width", legendWidth)
+  .attr("height", legendHeight)
+  .style("fill", "url(#linear-gradient)");
+
+// Add a scale for the color legend, using the same domain as the heatmap color scale
+// Define the scale for the legend, mapping the domain to the range (height of the legend)
+const legendScale = d3.scaleLinear()
+  .domain([min, max])  // Use the same domain as the heatmap color scale
+  .range([legendHeight, 0]);  // Map data range to legend height
+
+// Add a scale for the color legend and explicitly set the tick values to include min and max
+const legendAxis = d3.axisRight(legendScale)
+  .tickValues([min, (min + max) / 2, max])  // Set tick values to ensure min, mid, and max are displayed
+  .tickSize(4)  // Size of the ticks
+  .tickFormat(d3.format(".2f"));  // Format ticks with 2 decimal places
+
+// Append the axis to the legend
+legend.append("g")
+  .attr("class", "axis")
+  .attr("transform", `translate(${legendWidth}, 0)`)
+  .call(legendAxis);
+
+
   return Object.assign(svg.node(), {scales: {color}});
 }
