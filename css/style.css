@@ -142,3 +142,24 @@ header h1 {
         padding: 40px;
     }
 }
+
+/* Box Plot Container Styling */
+#boxplot-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #ebf7d4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.boxplot {
+    cursor: pointer;
+    width: 100%;
+    height: 200px; /* Adjust the height as needed */
+    margin: 0 10px;
+}
+

@@ -1,57 +1,130 @@
-// Function to initialize and update the calendar heatmap
-function updateHeatmap() {
-  // Get the selected parameter from the dropdown
-  const selectedParameter = document.getElementById("parameter-select").value;
+let globalData; // To store the parsed data
+let currentParameter = "Valence"; // To track the current parameter displayed
 
-  // Parse the CSV data and create the heatmap
-  d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
-    const container = document.getElementById("calendar-heatmap");
-    const containerWidth = container.clientWidth;
+// Load the data once and store it globally
+d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
+  globalData = data;
+  createBoxPlot(globalData); // Initialize the box plot
+  updateHeatmap(currentParameter); // Initialize heatmap with default parameter
+});
 
-    // Parse and group the data by date
-    const parsedData = d3.group(data.map(d => ({
-        date: d3.timeParse("%d/%m/%Y")(d.Date),
-        value: +d[selectedParameter]
-    })), d => d.date); //CHECK WHAT IS HAPPENING WITH THE 01/01 
+// Function to create the box plots
+function createBoxPlot(data) {
+  const parameters = ["Valence", "Danceability", "Energy", "Loudness"];
+  const container = d3.select("#boxplot-container");
+  const width = 150, height = 200, margin = { top: 10, right: 20, bottom: 30, left: 40 };
 
-    // Calculate the average of the first 20 values for each date
-    const averageData = Array.from(parsedData, ([date, values]) => {
-      const first20Values = values.slice(0, 20);
-      let averageFirst20 = d3.mean(first20Values, v => v.value); // Use 'let' instead of 'const'
-    
-      // Check if the averageFirst20 is an integer, if not, format it to 2 decimal places
-      averageFirst20 = Number.isInteger(averageFirst20) ? averageFirst20 : parseFloat(averageFirst20.toFixed(2));
-    
-      return {
-        date: date,
-        value: averageFirst20
-      };
-    });
-    
+  parameters.forEach(parameter => {
+    const svg = container.append("svg")
+      .attr("class", "boxplot")
+      .attr("width", width)
+      .attr("height", height)
+      .style("margin-right", "10px")
+      .style("cursor", "pointer")
+      .on("click", () => handleBoxPlotClick(parameter)); // Attach click event listener
 
-    // Create the calendar heatmap with the updated data
-    const calendarHeatmap = Calendar(averageData, {
-      x: d => d.date,
-      y: d => d.value,
-      width: containerWidth,
-      cellSize: 18.5,
-      weekday: "monday",
-      colors: d3.interpolatePiYG
-    });
+    const parameterData = data.map(d => +d[parameter]);
+    const stats = d3.boxplotSummary(parameterData);
 
-    // Clear any existing content in the heatmap container
-    container.innerHTML = '';
+    const x = d3.scaleBand().domain([parameter]).range([margin.left, width - margin.right]).padding(0.1);
+    const y = d3.scaleLinear().domain(d3.extent(parameterData)).nice().range([height - margin.bottom, margin.top]);
 
-    // Append the new heatmap to the container
-    container.appendChild(calendarHeatmap);
+    // Axes
+    svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x));
+    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
+
+    // Draw the box plot elements
+    const box = svg.append("rect")
+      .attr("x", x(parameter))
+      .attr("y", y(stats.q3))
+      .attr("height", y(stats.q1) - y(stats.q3))
+      .attr("width", x.bandwidth())
+      .attr("fill", "steelblue")
+      .attr("class", `box-plot-${parameter}`); // Add class for dynamic styling
+
+    svg.append("line")
+      .attr("x1", x(parameter))
+      .attr("x2", x(parameter) + x.bandwidth())
+      .attr("y1", y(stats.median))
+      .attr("y2", y(stats.median))
+      .attr("stroke", "black");
+
+    svg.selectAll(".whisker")
+      .data([stats.min, stats.max])
+      .enter().append("line")
+      .attr("x1", x(parameter) + x.bandwidth() / 2)
+      .attr("x2", x(parameter) + x.bandwidth() / 2)
+      .attr("y1", d => y(d))
+      .attr("y2", d => d === stats.min ? y(stats.q3) : y(stats.q1))
+      .attr("stroke", "black");
+
+    // Highlight border for the default parameter
+    if (parameter === currentParameter) {
+      highlightBoxPlot(parameter);
+    }
   });
 }
 
-// Add event listener to the dropdown to update the heatmap on selection change
-document.getElementById("parameter-select").addEventListener("change", updateHeatmap);
+// Function to handle box plot click
+function handleBoxPlotClick(parameter) {
+  currentParameter = parameter; // Update current parameter
+  updateHeatmap(parameter); // Update heatmap with new parameter
+  highlightBoxPlot(parameter); // Highlight the selected box plot
+}
 
-// Initial call to render the heatmap with default parameter
-updateHeatmap();
+// Function to highlight the selected box plot
+function highlightBoxPlot(parameter) {
+  // Reset all box plot borders
+  d3.selectAll(".boxplot rect").style("stroke", "none");
+
+  // Highlight the selected box plot
+  d3.select(`.box-plot-${parameter}`).style("stroke", "black").style("stroke-width", 2);
+}
+
+// Function to compute summary statistics for the box plot
+d3.boxplotSummary = function (data) {
+  const sorted = data.sort(d3.ascending);
+  return {
+    q1: d3.quantile(sorted, 0.25),
+    median: d3.quantile(sorted, 0.5),
+    q3: d3.quantile(sorted, 0.75),
+    min: sorted[0],
+    max: sorted[sorted.length - 1]
+  };
+};
+
+// Function to update the calendar heatmap
+function updateHeatmap(parameter = "Valence") {
+  const container = document.getElementById("calendar-heatmap");
+  const containerWidth = container.clientWidth;
+
+  // Process data only for the selected parameter
+  const parsedData = d3.group(globalData.map(d => ({
+    date: d3.timeParse("%d/%m/%Y")(d.Date),
+    value: +d[parameter]
+  })), d => d.date);
+
+  const averageData = Array.from(parsedData, ([date, values]) => {
+    const first20Values = values.slice(0, 20);
+    let averageFirst20 = d3.mean(first20Values, v => v.value);
+    averageFirst20 = Number.isInteger(averageFirst20) ? averageFirst20 : parseFloat(averageFirst20.toFixed(2));
+    return { date, value: averageFirst20 };
+  });
+
+  const calendarHeatmap = Calendar(averageData, {
+    x: d => d.date,
+    y: d => d.value,
+    width: containerWidth,
+    cellSize: 18.5,
+    weekday: "monday",
+    colors: d3.interpolatePiYG
+  });
+
+  container.innerHTML = ''; // Clear existing content
+  container.appendChild(calendarHeatmap); // Append new heatmap
+}
+
+//updateHeatmap();
 
 // Calendar Heatmap function
 function Calendar(data, {

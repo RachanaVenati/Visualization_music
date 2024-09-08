@@ -3,42 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUSIC PARAMETERS AND SOCIO ECONOMIC CONDITIONS</title>
+    <title>MUSIC ATTRIBUTES DISTRIBUTION AND COUNTRY CONTRIBUTIONS</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
         <img src="https://cdn-icons-png.flaticon.com/512/2111/2111624.png" alt="Spotify Logo" id="spotify-logo">
-        <h1>MUSIC AND SOCIOECONOMIC CONDITIONS</h1>
+        <h1>MUSIC ATTRIBUTES DISTRIBUTION AND COUNTRY CONTRIBUTIONS</h1>
     </header>
     <div class="content">
         <section id="analysis-section">
             <div class="section-header">
-                <div class="dropdowns">
-                    <div class="dropdown-box" id="year-dropdown">
-                        <label for="year-select">YEAR:</label>
-                        <select id="year-select">
-                            <option value="all">All</option>
-                            <option value="2017">2017</option>
-                            <option value="2018">2018</option>
-                            <option value="2019">2019</option>
-                            <option value="2020">2020</option>
-                            <option value="2021">2021</option>
-                            <option value="2022">2022</option>
-                            <option value="2023">2023</option>
-                        </select>
-                    </div>
-                    <div class="dropdown-box">
-                        <label for="parameter-select">Music Parameter:</label>
-                        <select id="parameter-select">
-                            <option value="Valence">Valence</option>
-                            <option value="Danceability">Danceability</option>
-                            <option value="Energy">Energy</option>
-                            <option value="Loudness">Loudness</option>
-                            
-                        </select>
-                    </div>
+                <div id="boxplot-container">
+                    <!-- Box plots will be rendered here -->
+
                 </div>
+                
             </div>
     
             <section class="section" id="music-parameters">
