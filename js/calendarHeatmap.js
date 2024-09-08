@@ -12,7 +12,7 @@ d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
 function createBoxPlot(data) {
   const parameters = ["Valence", "Danceability", "Energy", "Loudness"];
   const container = d3.select("#boxplot-container");
-  const width = 150, height = 200, margin = { top: 10, right: 20, bottom: 30, left: 40 };
+  const width = 150, height = 200, margin = { top: 10, right: 20, bottom: 30, left: 60 };
 
   parameters.forEach(parameter => {
     const svg = container.append("svg")
@@ -39,7 +39,7 @@ function createBoxPlot(data) {
       .attr("y", y(stats.q3))
       .attr("height", y(stats.q1) - y(stats.q3))
       .attr("width", x.bandwidth())
-      .attr("fill", "steelblue")
+      .attr("fill", "green")
       .attr("class", `box-plot-${parameter}`); // Add class for dynamic styling
 
     svg.append("line")
@@ -49,6 +49,7 @@ function createBoxPlot(data) {
       .attr("y2", y(stats.median))
       .attr("stroke", "black");
 
+    //add whiskers
     svg.selectAll(".whisker")
       .data([stats.min, stats.max])
       .enter().append("line")
@@ -56,6 +57,16 @@ function createBoxPlot(data) {
       .attr("x2", x(parameter) + x.bandwidth() / 2)
       .attr("y1", d => y(d))
       .attr("y2", d => d === stats.min ? y(stats.q3) : y(stats.q1))
+      .attr("stroke", "black");
+
+        // Add small horizontal lines at the ends of the whiskers
+    svg.selectAll(".whisker-end")
+      .data([stats.min, stats.max])
+      .enter().append("line")
+      .attr("x1", x(parameter) + x.bandwidth() / 4)
+      .attr("x2", x(parameter) + (3 * x.bandwidth()) / 4)
+      .attr("y1", d => y(d))
+      .attr("y2", d => y(d))
       .attr("stroke", "black");
 
     // Highlight border for the default parameter
