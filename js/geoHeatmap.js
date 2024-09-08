@@ -68,9 +68,8 @@ Promise.all([
             if (countryInfo) {
                 const contribution = countryInfo.totalPoints || 0;
                 const percentage = (contribution / totalPoints * 100).toFixed(4);
-                const topSongData = countryInfo.topSong;
-                const topSong = topSongData ? topSongData['Song Name'] : 'N/A';
-                const topArtist = topSongData ? topSongData['Artist'] : 'N/A';
+                
+                
 
                 d3.select("body").append("div")
                     .attr("class", "tooltip")
@@ -83,7 +82,7 @@ Promise.all([
                     .style("left", `${event.pageX + 10}px`)
                     .style("top", `${event.pageY + 10}px`)
                     .style("pointer-events", "none")
-                    .html(`<strong>${countryName}</strong><br/>Percentage: ${percentage}%<br/>Top Song: ${topSong}<br/>Artist: ${topArtist}`);
+                    .html(`<strong>${countryName}</strong><br/>Percentage: ${percentage}`);
             }
         })
         .on("mousemove", function(event) {
