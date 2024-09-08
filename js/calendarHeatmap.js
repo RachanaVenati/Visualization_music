@@ -12,14 +12,27 @@ d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
 function createBoxPlot(data) {
   const parameters = ["Valence", "Danceability", "Energy", "Loudness"];
   const container = d3.select("#boxplot-container");
-  const width = 150, height = 200, margin = { top: 10, right: 20, bottom: 30, left: 60 };
+  const width = 125, height = 200, margin = { top: 5, right: 5, bottom: 25, left: 60 };
+
+  // Create tooltip element
+  const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("display", "none")
+    .style("padding", "10px")
+    .style("background", "#fff")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "5px")
+    .style("pointer-events", "none")
+    .style("box-shadow", "0 2px 6px rgba(0, 0, 0, 0.2)")
+    .style("white-space", "nowrap");
 
   parameters.forEach(parameter => {
     const svg = container.append("svg")
       .attr("class", "boxplot")
       .attr("width", width)
       .attr("height", height)
-      .style("margin-right", "10px")
+      .style("margin-right", "5px")
       .style("cursor", "pointer")
       .on("click", () => handleBoxPlotClick(parameter)); // Attach click event listener
 
@@ -59,7 +72,7 @@ function createBoxPlot(data) {
       .attr("y2", d => d === stats.min ? y(stats.q3) : y(stats.q1))
       .attr("stroke", "black");
 
-        // Add small horizontal lines at the ends of the whiskers
+    // Add small horizontal lines at the ends of the whiskers
     svg.selectAll(".whisker-end")
       .data([stats.min, stats.max])
       .enter().append("line")
@@ -69,11 +82,132 @@ function createBoxPlot(data) {
       .attr("y2", d => y(d))
       .attr("stroke", "black");
 
+    // Add tooltip functionality
+    svg.selectAll("rect, line")
+      .on("mouseover", function(event) {
+        const [xPos, yPos] = d3.pointer(event, this);
+        const offsetX = 0;  
+        const offsetY = 0;  
+        tooltip.style("display", "block")
+          .style("left", `${xPos + offsetX}px`)
+          .style("top", `${yPos + offsetY}px`)
+          .html(`
+            <strong>Parameter:</strong> ${parameter}<br>
+            <strong>Min:</strong> ${stats.min}<br>
+            <strong>Q1:</strong> ${stats.q1}<br>
+            <strong>Median:</strong> ${stats.median}<br>
+            <strong>Q3:</strong> ${stats.q3}<br>
+            <strong>Max:</strong> ${stats.max}
+          `);
+      })
+      .on("mousemove", function(event) {
+        const [xPos, yPos] = d3.pointer(event, this);
+        const offsetX = 0;  
+        const offsetY = 0;  
+        tooltip.style("left", `${xPos + offsetX}px`)
+          .style("top", `${yPos + offsetY}px`);
+      })
+      .on("mouseout", function() {
+        tooltip.style("display", "none");
+      });
+
     // Highlight border for the default parameter
     if (parameter === currentParameter) {
       highlightBoxPlot(parameter);
     }
   });
+
+  createBoxPlotLegend(container);
+}
+
+function createBoxPlotLegend(container) {
+  const legendWidth = 100, legendHeight = 200;
+  const legendSvg = container.append("svg")
+    .attr("class", "boxplot-legend") // Add class for styling
+    .attr("width", legendWidth)
+    .attr("height", legendHeight)
+    .style("margin-left", "10px") // Margin to separate from boxplots
+    .style("border", "1px solid #ddd"); // Border for visual debugging
+
+  // Sample boxplot representation in the legend
+  const legendMargin = { top: 25, right: 5, bottom: 25, left: 20 };
+  const centerX = (legendWidth - legendMargin.left - legendMargin.right) / 2 + legendMargin.left;
+  const sampleY = d3.scaleLinear().domain([0, 100]).range([legendHeight - legendMargin.bottom, legendMargin.top]);
+
+  // Draw the sample box
+  legendSvg.append("rect")
+    .attr("x", centerX - 20)
+    .attr("y", sampleY(75)) // Q3 position
+    .attr("width", 40)
+    .attr("height", sampleY(25) - sampleY(75)) // Q1 - Q3 height
+    .attr("fill", "green");
+
+  // Draw median line
+  legendSvg.append("line")
+    .attr("x1", centerX - 20)
+    .attr("x2", centerX + 20)
+    .attr("y1", sampleY(50)) // Median position
+    .attr("y2", sampleY(50))
+    .attr("stroke", "black");
+
+  // Draw whiskers
+  legendSvg.append("line")
+    .attr("x1", centerX)
+    .attr("x2", centerX)
+    .attr("y1", sampleY(0)) // Min
+    .attr("y2", sampleY(100)) // Max
+    .attr("stroke", "black");
+
+  // Draw whisker ends
+  legendSvg.append("line")
+    .attr("x1", centerX - 10)
+    .attr("x2", centerX + 10)
+    .attr("y1", sampleY(0)) // Min line
+    .attr("y2", sampleY(0))
+    .attr("stroke", "black");
+
+  legendSvg.append("line")
+    .attr("x1", centerX - 10)
+    .attr("x2", centerX + 10)
+    .attr("y1", sampleY(100)) // Max line
+    .attr("y2", sampleY(100))
+    .attr("stroke", "black");
+
+  // Add labels
+  legendSvg.append("text")
+    .attr("x", centerX + 25)
+    .attr("y", sampleY(50))
+    .attr("dy", "0.35em")
+    .style("font-size", "12px")
+    .text("Median");
+
+  legendSvg.append("text")
+    .attr("x", centerX + 25)
+    .attr("y", sampleY(75))
+    .attr("dy", "0.35em")
+    .style("font-size", "12px")
+    .text("Q3 (75th Percentile)");
+
+  legendSvg.append("text")
+    .attr("x", centerX + 25)
+    .attr("y", sampleY(25))
+    .attr("dy", "0.35em")
+    .style("font-size", "12px")
+    .text("Q1 (25th Percentile)");
+
+  legendSvg.append("text")
+    .attr("x", centerX + 25)
+    .attr("y", sampleY(100))
+    .attr("dy", "0.35em")
+    .style("font-size", "12px")
+    .text("Max");
+
+  legendSvg.append("text")
+    .attr("x", centerX + 25)
+    .attr("y", sampleY(0))
+    .attr("dy", "0.35em")
+    .style("font-size", "12px")
+    .text("Min");
 }
 
 // Function to handle box plot click
@@ -134,8 +268,6 @@ function updateHeatmap(parameter = "Valence") {
   container.innerHTML = ''; // Clear existing content
   container.appendChild(calendarHeatmap); // Append new heatmap
 }
-
-//updateHeatmap();
 
 // Calendar Heatmap function
 function Calendar(data, {
