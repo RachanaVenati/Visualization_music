@@ -57,6 +57,7 @@ Promise.all([
         .attr("stroke", "#333")
         .attr("stroke-width", 0.5)
         .on("mouseover", function(event, d) {
+            d3.select(".tooltip").remove();
             d3.select(this).attr("stroke-width", 2);
             const countryName = d.properties.name;
             const contribution = countryData.get(countryName) || 0;
