@@ -1,6 +1,6 @@
 let globalData; // To store the parsed data
 let currentParameter = "Valence"; // To track the current parameter displayed
-
+window.currentParameter;
 // Load the data once and store it globally
 d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
   globalData = data;
@@ -268,6 +268,45 @@ function updateHeatmap(parameter = "Valence") {
   container.innerHTML = ''; // Clear existing content
   container.appendChild(calendarHeatmap); // Append new heatmap
 }
+
+// Add this function to handle updates based on selected country
+function updateCalendarHeatmap(countryName) {
+  const container = document.getElementById("calendar-heatmap");
+  const containerWidth = container.clientWidth;
+
+  // Filter global data based on the selected country
+  const filteredData = globalData.filter(d => {
+      // Assume the country information is stored in a 'Country' field
+      return d.Country === countryName;
+  });
+
+  // Process the filtered data
+  const parsedData = d3.group(filteredData.map(d => ({
+      date: d3.timeParse("%d/%m/%Y")(d.Date),
+      value: +d[currentParameter]
+  })), d => d.date);
+
+  const averageData = Array.from(parsedData, ([date, values]) => {
+      const first20Values = values.slice(0, 20);
+      let averageFirst20 = d3.mean(first20Values, v => v.value);
+      averageFirst20 = Number.isInteger(averageFirst20) ? averageFirst20 : parseFloat(averageFirst20.toFixed(2));
+      return { date, value: averageFirst20 };
+  });
+
+  const calendarHeatmap = Calendar(averageData, {
+      x: d => d.date,
+      y: d => d.value,
+      width: containerWidth,
+      cellSize: 18.5,
+      weekday: "monday",
+      colors: d3.interpolatePiYG
+  });
+
+  container.innerHTML = ''; // Clear existing content
+  container.appendChild(calendarHeatmap); // Append new heatmap
+}
+window.updateCalendarHeatmap = updateCalendarHeatmap;
+
 
 // Calendar Heatmap function
 function Calendar(data, {
