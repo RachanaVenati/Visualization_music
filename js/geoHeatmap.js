@@ -160,13 +160,13 @@ Promise.all([
         // Calculate the average of the first 20 values for each date
         const averageData = Array.from(parsedData, ([date, values]) => {
             const first20Values = values.slice(0, 20);
-            let averageFirst20 = d3.mean(first20Values, v => v.value);
+            let average = d3.mean(values, v => v.value);
             
-            averageFirst20 = Number.isInteger(averageFirst20) ? averageFirst20 : parseFloat(averageFirst20.toFixed(2));
+            average = Number.isInteger(average) ? average : parseFloat(average.toFixed(2));
             
             return {
                 date: date,
-                value: averageFirst20
+                value: average
             };
         });
 
