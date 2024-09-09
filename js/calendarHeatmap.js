@@ -8,24 +8,45 @@ d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
   updateHeatmap(currentParameter); // Initialize heatmap with default parameter
 });
 
+// Create a tooltip div and hide it initially
+const tooltip = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("background-color", "white")
+  .style("border", "1px solid #ddd")
+  .style("padding", "8px")
+  .style("font-size", "12px")
+  .style("border-radius", "4px")
+  .style("pointer-events", "none")
+  .style("opacity", 0); // Start with tooltip hidden
+
+// Function to show the tooltip with the parameter stats
+function showTooltip(parameter, stats) {
+  tooltip.style("opacity", 1)
+    .html(`<strong>${parameter}</strong><br>
+           Min: ${stats.min.toFixed(2)}<br>
+           Q1: ${stats.q1.toFixed(2)}<br>
+           Median: ${stats.median.toFixed(2)}<br>
+           Q3: ${stats.q3.toFixed(2)}<br>
+           Max: ${stats.max.toFixed(2)}`);
+}
+
+// Function to move the tooltip with the mouse
+function moveTooltip(event) {
+  tooltip.style("left", (event.pageX + 10) + "px")
+    .style("top", (event.pageY - 28) + "px");
+}
+
+// Function to hide the tooltip
+function hideTooltip() {
+  tooltip.style("opacity", 0);
+}
+
 // Function to create the box plots
 function createBoxPlot(data) {
   const parameters = ["Valence", "Danceability", "Energy", "Loudness"];
   const container = d3.select("#boxplot-container");
   const width = 125, height = 200, margin = { top: 5, right: 5, bottom: 25, left: 60 };
-
-  // Create tooltip element
-  const tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("position", "absolute")
-    .style("display", "none")
-    .style("padding", "10px")
-    .style("background", "#fff")
-    .style("border", "1px solid #ccc")
-    .style("border-radius", "5px")
-    .style("pointer-events", "none")
-    .style("box-shadow", "0 2px 6px rgba(0, 0, 0, 0.2)")
-    .style("white-space", "nowrap");
 
   parameters.forEach(parameter => {
     const svg = container.append("svg")
@@ -34,7 +55,10 @@ function createBoxPlot(data) {
       .attr("height", height)
       .style("margin-right", "5px")
       .style("cursor", "pointer")
-      .on("click", () => handleBoxPlotClick(parameter)); // Attach click event listener
+      .on("click", () => handleBoxPlotClick(parameter)) // Attach click event listener
+      .on("mouseover", () => showTooltip(parameter, stats))  // Show tooltip on mouseover
+      .on("mousemove", (event) => moveTooltip(event))       // Move tooltip with the mouse
+      .on("mouseout", hideTooltip);                         // Hide tooltip on mouseout
 
     const parameterData = data.map(d => +d[parameter]);
     const stats = d3.boxplotSummary(parameterData);
@@ -81,35 +105,6 @@ function createBoxPlot(data) {
       .attr("y1", d => y(d))
       .attr("y2", d => y(d))
       .attr("stroke", "black");
-
-    // Add tooltip functionality
-    svg.selectAll("rect, line")
-      .on("mouseover", function(event) {
-        const [xPos, yPos] = d3.pointer(event, this);
-        const offsetX = 0;  
-        const offsetY = 0;  
-        tooltip.style("display", "block")
-          .style("left", `${xPos + offsetX}px`)
-          .style("top", `${yPos + offsetY}px`)
-          .html(`
-            <strong>Parameter:</strong> ${parameter}<br>
-            <strong>Min:</strong> ${stats.min}<br>
-            <strong>Q1:</strong> ${stats.q1}<br>
-            <strong>Median:</strong> ${stats.median}<br>
-            <strong>Q3:</strong> ${stats.q3}<br>
-            <strong>Max:</strong> ${stats.max}
-          `);
-      })
-      .on("mousemove", function(event) {
-        const [xPos, yPos] = d3.pointer(event, this);
-        const offsetX = 0;  
-        const offsetY = 0;  
-        tooltip.style("left", `${xPos + offsetX}px`)
-          .style("top", `${yPos + offsetY}px`);
-      })
-      .on("mouseout", function() {
-        tooltip.style("display", "none");
-      });
 
     // Highlight border for the default parameter
     if (parameter === currentParameter) {
