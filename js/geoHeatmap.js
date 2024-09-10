@@ -1,7 +1,7 @@
 // Load your GeoJSON data and Spotify data
 Promise.all([
     d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'), // World map GeoJSON
-    d3.dsv(";", "data/Spotify_Dataset_V3.csv") 
+    d3.dsv(";", "data/Spotify_Dataset_V3.csv")
 ]).then(([geoData, spotifyData]) => {
 
     const countryNameMapping = {
@@ -55,7 +55,7 @@ Promise.all([
             const countryName = d.properties.name; // Country name from GeoJSON
             const countryInfo = countryData.get(countryName);
             if (!countryInfo) return zeroColor;
-            
+
             const percentage = countryInfo.totalPoints / totalPoints;
             return percentage > 0 ? colorScale(percentage) : zeroColor;
         })
@@ -68,8 +68,8 @@ Promise.all([
             if (countryInfo) {
                 const contribution = countryInfo.totalPoints || 0;
                 const percentage = (contribution / totalPoints * 100).toFixed(4);
-                
-                
+
+
 
                 d3.select("body").append("div")
                     .attr("class", "tooltip")
@@ -96,10 +96,18 @@ Promise.all([
         })
         .on("click", function(event, d) {
             const countryName = d.properties.name;
+            svg.selectAll("path")
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.5);
+        d3.select(this)
+        .attr("stroke", "red")
+        .attr("stroke-width", 2);
             updateCalendarHeatmap(countryName);
             updateBoxPlot(countryName);
-        });
-
+        })
+        document.getElementById('global-data-btn').addEventListener('click', function() {
+             updateGlobalCalendarHeatmap();
+         });
     // Create a vertical legend for the color scale
     const legendHeight = 300;
     const legendWidth = 10;
@@ -148,7 +156,7 @@ Promise.all([
     function updateCalendarHeatmap(countryName) {
         // Filter the Spotify data for the selected country
         const countrySpecificData = spotifyData.filter(d => (countryNameMapping[d.Nationality] || d.Nationality) === countryName);
-        
+
         // Update the calendar heatmap
         const selectedParameter = currentParameter;
 
@@ -162,9 +170,9 @@ Promise.all([
         const averageData = Array.from(parsedData, ([date, values]) => {
             const first20Values = values.slice(0, 20);
             let average = d3.mean(values, v => v.value);
-            
+
             average = Number.isInteger(average) ? average : parseFloat(average.toFixed(2));
-            
+
             return {
                 date: date,
                 value: average
@@ -190,15 +198,64 @@ Promise.all([
         // Append the new heatmap to the container
         container.appendChild(calendarHeatmap);
     }
+    function updateGlobalCalendarHeatmap() {
+            // Filter Spotify data globally (all countries)
+            svg.selectAll("path")
+            .attr("stroke", "#333")
+            .attr("stroke-width", 0.5);
+            // If click is outside the map, reset to the global calendar heatmap
+            selectedCountry = null;
+            const globalData = spotifyData;
+
+            // Parse and group the data by date
+            const parsedData = d3.group(globalData.map(d => ({
+                date: d3.timeParse("%d/%m/%Y")(d.Date),
+                value: +d[currentParameter]
+            })), d => d.date);
+
+            // Calculate the average of the first 20 values for each date
+            const averageData = Array.from(parsedData, ([date, values]) => {
+                const first20Values = values.slice(0, 20);
+                let average = d3.mean(values, v => v.value);
+                average = Number.isInteger(average) ? average : parseFloat(average.toFixed(2));
+
+                return {
+                    date: date,
+                    value: average
+                };
+            });
+
+            // Create the global calendar heatmap
+            const container = document.getElementById("calendar-heatmap");
+            const containerWidth = container.clientWidth;
+
+            const calendarHeatmap = Calendar(averageData, {
+                x: d => d.date,
+                y: d => d.value,
+                width: containerWidth,
+                cellSize: 18.5,
+                weekday: "monday",
+                colors: d3.interpolatePiYG
+            });
+
+            // Clear existing heatmap content
+            container.innerHTML = '';
+
+            // Append the new heatmap to the container
+            container.appendChild(calendarHeatmap);
+            const container_1 = d3.select("#boxplot-container");
+            container_1.selectAll("*").remove();
+            createBoxPlot(globalData);
+
+
+        }
 
     function updateBoxPlot(countryName) {
         // Filter the Spotify data for the selected country
         const countrySpecificData = spotifyData.filter(d => (countryNameMapping[d.Nationality] || d.Nationality) === countryName);
-    
         // Clear any existing content in the box plot container
         const container = d3.select("#boxplot-container");
         container.selectAll("*").remove();
-    
         // Create the box plots with the updated data
         createBoxPlot(countrySpecificData);
     }
