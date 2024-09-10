@@ -8,13 +8,21 @@ d3.dsv(";", "data/Spotify_Dataset_V3.csv").then(data => {
   updateHeatmap(currentParameter); // Initialize heatmap with default parameter
 });
 
-
-
 // Function to create the box plots
 function createBoxPlot(data) {
   const parameters = ["Valence", "Danceability", "Energy", "Loudness"];
   const container = d3.select("#boxplot-container");
   const width = 125, height = 200, margin = { top: 5, right: 5, bottom: 25, left: 60 };
+
+  const tooltip = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("background-color", "white")
+  .style("border", "1px solid black")
+  .style("padding", "5px")
+  .style("border-radius", "5px")
+  .style("pointer-events", "none")
+  .style("opacity", 0);
 
   parameters.forEach(parameter => {
     const svg = container.append("svg")
@@ -42,7 +50,27 @@ function createBoxPlot(data) {
       .attr("height", y(stats.q1) - y(stats.q3))
       .attr("width", x.bandwidth())
       .attr("fill", "green")
-      .attr("class", `box-plot-${parameter}`); // Add class for dynamic styling
+      .attr("class", `box-plot-${parameter}`)
+      .on("mouseover", function(event) {
+        tooltip.transition().style("opacity", 1);
+        tooltip.html(
+          `<strong>${parameter}</strong><br>
+           Min: ${stats.min.toFixed(2)}<br>
+           Q1: ${stats.q1.toFixed(2)}<br>
+           Median: ${stats.median.toFixed(2)}<br>
+           Q3: ${stats.q3.toFixed(2)}<br>
+           Max: ${stats.max.toFixed(2)}`
+        )
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mousemove", function(event) {
+        tooltip.style("left", (event.pageX + 10) + "px")
+               .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.transition().style("opacity", 0);
+      });
 
     svg.append("line")
       .attr("x1", x(parameter))
@@ -79,6 +107,8 @@ function createBoxPlot(data) {
 
   createBoxPlotLegend(container);
 }
+
+
 
 function createBoxPlotLegend(container) {
   const legendWidth = 100, legendHeight = 200;
@@ -169,6 +199,7 @@ function createBoxPlotLegend(container) {
     .style("font-size", "12px")
     .text("Min");
 }
+
 
 function handleBoxPlotClick(parameter) {
   currentParameter = parameter; // Update global parameter
@@ -265,7 +296,6 @@ function updateCalendarHeatmap(countryName) {
   container.appendChild(calendarHeatmap); // Append new heatmap
 }
 window.updateCalendarHeatmap = updateCalendarHeatmap;
-
 
 // Calendar Heatmap function
 function Calendar(data, {
