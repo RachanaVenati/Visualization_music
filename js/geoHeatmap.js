@@ -97,6 +97,7 @@ Promise.all([
         .on("click", function(event, d) {
             const countryName = d.properties.name;
             updateCalendarHeatmap(countryName);
+            updateBoxPlot(countryName);
         });
 
     // Create a vertical legend for the color scale
@@ -188,5 +189,17 @@ Promise.all([
 
         // Append the new heatmap to the container
         container.appendChild(calendarHeatmap);
+    }
+
+    function updateBoxPlot(countryName) {
+        // Filter the Spotify data for the selected country
+        const countrySpecificData = spotifyData.filter(d => (countryNameMapping[d.Nationality] || d.Nationality) === countryName);
+    
+        // Clear any existing content in the box plot container
+        const container = d3.select("#boxplot-container");
+        container.selectAll("*").remove();
+    
+        // Create the box plots with the updated data
+        createBoxPlot(countrySpecificData);
     }
 });
