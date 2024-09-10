@@ -15,7 +15,7 @@ function createBoxPlot(data) {
   const width = 125, height = 200, margin = { top: 5, right: 5, bottom: 25, left: 60 };
 
   const tooltip = d3.select("body").append("div")
-  .attr("class", "tooltip")
+  .attr("class", "boxplot-tooltip")
   .style("position", "absolute")
   .style("background-color", "white")
   .style("border", "1px solid black")
@@ -104,8 +104,10 @@ function createBoxPlot(data) {
       highlightBoxPlot(parameter);
     }
   });
+  if(container.select("boxplot-legend").empty()){
+      createBoxPlotLegend(container);
+  }
 
-  createBoxPlotLegend(container);
 }
 
 
