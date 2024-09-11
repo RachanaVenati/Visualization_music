@@ -100,7 +100,19 @@ header h1 {
     margin-bottom: 20px;
     color: #8e9791;
 }
-
+.section-header{
+    color: #8e9791;
+    margin-bottom: 20px;
+}
+#box-plot-section
+{
+    color: #8e9791;
+    margin-bottom: 20px;
+    background-color: #ebf7d4;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
 /* Visualization Containers */
 #calendar-heatmap {
     background-color: #ffffff;
