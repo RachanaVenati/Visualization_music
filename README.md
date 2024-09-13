@@ -19,8 +19,7 @@ https://www.kaggle.com/datasets/brunoalarcon123/top-200-spotify-songs-dataset
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 # COMMENTS
-1. Please replace actual .csv(https://www.kaggle.com/datasets/brunoalarcon123/top-200-spotify-songs-dataset) in the data folder, since we are unable to upload to git since it is 157 MB.
-
+1. Please replace actual .csv(https://www.kaggle.com/datasets/brunoalarcon123/top-200-spotify-songs-dataset) in the data folder.
 ----------------------------------------------------------------------------------------------------------------------------------------
 # FUNCTIONALITIES
    
