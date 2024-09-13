@@ -1,34 +1,17 @@
 # Visualization_music
 
 # Problem statement
-.Visualization of relation between music parameters like tempo, and energy to the socioeconomic condition of the country.
 
-.Geoheat map to show country contribution.
+*Boxplot shows the music parameters that can be selected, along with the parameter distribution of  max, min ,median,Q1, and Q3.
+
+*Visualization of the relation between music parameters and the socioeconomic condition of the country.
+
+*Geoheat map to show country contribution in the music data set.
 
 -------------------------------------------------------------------------------------------------------------------------------------
 
 # Data Set
 https://www.kaggle.com/datasets/brunoalarcon123/top-200-spotify-songs-dataset
-
--------------------------------------------------------------------------------------------------------------------------------------
-
-# Calendar heatmap d3
-https://observablehq.com/@d3/calendar
-
-https://www.crowdanalytix.com/communityBlog/10-steps-to-create-calendar-view-heatmap-in-d3-js
-
-https://observablehq.com/@mbostock/electric-usage-2019
-
--------------------------------------------------------------------------------------------------------------------------------------
-
-# Geo map d3
-https://d3-graph-gallery.com/graph/choropleth_basic.html
-
-https://www.d3indepth.com/geographic/
-
-https://observablehq.com/@d3/choropleth
-
-https://gist.github.com/palewire/d2906de347a160f38bc0b7ca57721328
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 # COMMENTS
